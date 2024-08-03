@@ -1,4 +1,4 @@
-package internal
+package config
 
 import (
 	"flag"
@@ -8,35 +8,30 @@ import (
 )
 
 type Config struct {
-	App      App
-	Services []Service
+	App      App                `mapstructure:"app"`
+	Services map[string]Service `mapstructure:"services"`
 }
 
 type App struct {
 	Debug   bool
-	Version string
+	Version string `mapstructure:"version"`
 }
+
 type Service struct {
-	Name string `mapstructure:"name"`
 	Host string `mapstructure:"host"`
 }
 
 var debug bool
 
 func LoadConfig() *Config {
-	var services []Service
-	if err := viper.UnmarshalKey("services", &services); err != nil {
-		log.Fatal("unable to decode services", err)
+	var config Config
+
+	if err := viper.Unmarshal(&config); err != nil {
+		log.Fatalf("Error al mapear la configuración: %s", err)
 	}
 
-	config := Config{
-		App: App{
-			Debug:   debug,
-			Version: viper.GetString("version"),
-		},
-		Services: services,
-	}
-	flag.Parse()
+	config.App.Debug = debug
+
 	return &config
 }
 
