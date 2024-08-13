@@ -43,7 +43,7 @@ func main() {
 	router := e.Group(baseUrl)
 
 	// private router
-	priv := router.Group("/")
+	priv := router.Group("/_")
 	priv.Use(echojwt.WithConfig(echojwt.Config{
 		NewClaimsFunc: func(c echo.Context) jwt.Claims {
 			return new(entities.CustomClaims)
