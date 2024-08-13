@@ -41,16 +41,13 @@ func main() {
 
 	// main router
 	router := e.Group(baseUrl)
-
-	// private router
-	priv := router.Group("/_")
-	priv.Use(echojwt.WithConfig(echojwt.Config{
+	router.Use(echojwt.WithConfig(echojwt.Config{
 		NewClaimsFunc: func(c echo.Context) jwt.Claims {
 			return new(entities.CustomClaims)
 		},
 		SigningKey: []byte(os.Getenv("JWT_SECRET")),
 		Skipper: func(c echo.Context) bool {
-			return c.Path() == baseUrl+"/login"
+			return c.Path() == baseUrl+"/login" || c.Path() == baseUrl+"/signup" || c.Path() == baseUrl+"/signup/partner"
 		},
 	}))
 
@@ -58,7 +55,7 @@ func main() {
 	router.POST(accountsBaseUrl+"/signup/partner", svc.SignupPartnerHandler)
 	router.POST("/login", svc.LoginHandler)
 
-	priv.GET("/priv", func(c echo.Context) error {
+	router.GET("/priv", func(c echo.Context) error {
 		return c.JSON(200, "hola")
 	}, middlewares.AllowedRoles("FoodPlace", "Customer"))
 
