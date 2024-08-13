@@ -3,13 +3,11 @@ package config
 import (
 	"fmt"
 	"os"
-)
 
-// var (
-// 	minTokenTTL     = 10 * time.Minute
-// 	maxTokenTTL     = 3 * time.Hour
-// 	defaultTokenTTL = 15 * time.Minute
-// )
+	"cosmossdk.io/errors"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
+)
 
 func MustMapEnv(target *string, envKey string) {
 	v := os.Getenv(envKey)
@@ -19,17 +17,13 @@ func MustMapEnv(target *string, envKey string) {
 	*target = v
 }
 
-// func NormalizeTime(ttlTime time.Duration) time.Duration {
-// 	var ttl = ttlTime
+func MustConnGRPC(conn **grpc.ClientConn, addr string) {
+	var err error
 
-// 	if ttl <= 0 {
-// 		return defaultTokenTTL
-// 	}
+	// *conn, err = grpc.DialContext(ctx, addr)
+	*conn, err = grpc.NewClient(addr, grpc.WithTransportCredentials(insecure.NewCredentials()))
 
-// 	if ttl < minTokenTTL {
-// 		ttl = minTokenTTL
-// 	} else if ttl > maxTokenTTL {
-// 		ttl = maxTokenTTL
-// 	}
-// 	return ttl
-// }
+	if err != nil {
+		panic(errors.Wrapf(err, "grpc: failed to connect %s", addr))
+	}
+}

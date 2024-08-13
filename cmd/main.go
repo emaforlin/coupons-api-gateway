@@ -3,7 +3,6 @@ package main
 import (
 	"os"
 
-	"cosmossdk.io/errors"
 	"github.com/emaforlin/api-gateway/internal/config"
 	"github.com/emaforlin/api-gateway/internal/entities"
 	"github.com/emaforlin/api-gateway/internal/middlewares"
@@ -13,8 +12,6 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/lpernett/godotenv"
-	"google.golang.org/grpc"
-	"google.golang.org/grpc/credentials/insecure"
 )
 
 const (
@@ -24,25 +21,20 @@ const (
 )
 
 func main() {
-	err := godotenv.Load()
-	if err != nil {
-		panic(errors.Wrapf(err, "could not load .env"))
-	}
+	godotenv.Load()
 
 	svc := new(server.APIGatewayServer)
 
 	baseUrl := os.Getenv("BASE_URL")
-
 	srvPort := port
 	if os.Getenv("PORT") != "" {
 		srvPort = os.Getenv("PORT")
 	}
-
 	addr := os.Getenv("LISTEN_ADDR")
 
-	config.MustMapEnv(&svc.AccountSvcAddr, "ACCOUNT_SERVICE_ADDR")
+	config.MustMapEnv(&svc.AccountSvcAddr, "ACCOUNTS_SERVICE_ADDR")
 
-	mustConnGRPC(&svc.AccountSvcConn, svc.AccountSvcAddr)
+	config.MustConnGRPC(&svc.AccountSvcConn, svc.AccountSvcAddr)
 
 	e := echo.New()
 	e.Use(middleware.Recover(), middleware.Logger())
@@ -51,8 +43,8 @@ func main() {
 	router := e.Group(baseUrl)
 
 	// private router
-	restricted := router.Group("")
-	restricted.Use(echojwt.WithConfig(echojwt.Config{
+	priv := router.Group("")
+	priv.Use(echojwt.WithConfig(echojwt.Config{
 		NewClaimsFunc: func(c echo.Context) jwt.Claims {
 			return new(entities.CustomClaims)
 		},
@@ -64,20 +56,9 @@ func main() {
 	accountRouter.POST("/signup", svc.SignupHandler)
 	accountRouter.POST("/signup/partner", svc.SignupPartnerHandler)
 
-	restricted.GET("/priv", func(c echo.Context) error {
+	priv.GET("/priv", func(c echo.Context) error {
 		return c.JSON(200, "hola")
 	}, middlewares.AllowedRoles("FoodPlace", "Customer"))
 
 	e.Logger.Fatal(e.Start(addr + ":" + srvPort))
-}
-
-func mustConnGRPC(conn **grpc.ClientConn, addr string) {
-	var err error
-
-	// *conn, err = grpc.DialContext(ctx, addr)
-	*conn, err = grpc.NewClient(addr, grpc.WithTransportCredentials(insecure.NewCredentials()))
-
-	if err != nil {
-		panic(errors.Wrapf(err, "grpc: failed to connect %s", addr))
-	}
 }
