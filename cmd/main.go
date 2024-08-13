@@ -43,7 +43,7 @@ func main() {
 	router := e.Group(baseUrl)
 
 	// private router
-	priv := router.Group("")
+	priv := router.Group("/")
 	priv.Use(echojwt.WithConfig(echojwt.Config{
 		NewClaimsFunc: func(c echo.Context) jwt.Claims {
 			return new(entities.CustomClaims)
@@ -51,10 +51,9 @@ func main() {
 		SigningKey: []byte(os.Getenv("JWT_SECRET")),
 	}))
 
-	accountRouter := router.Group(accountsBaseUrl)
-
-	accountRouter.POST("/signup", svc.SignupHandler)
-	accountRouter.POST("/signup/partner", svc.SignupPartnerHandler)
+	router.POST(accountsBaseUrl+"/signup", svc.SignupHandler)
+	router.POST(accountsBaseUrl+"/signup/partner", svc.SignupPartnerHandler)
+	router.POST("/login", svc.LoginHandler)
 
 	priv.GET("/priv", func(c echo.Context) error {
 		return c.JSON(200, "hola")
