@@ -49,6 +49,9 @@ func main() {
 			return new(entities.CustomClaims)
 		},
 		SigningKey: []byte(os.Getenv("JWT_SECRET")),
+		Skipper: func(c echo.Context) bool {
+			return c.Path() == baseUrl+"/login"
+		},
 	}))
 
 	router.POST(accountsBaseUrl+"/signup", svc.SignupHandler)
