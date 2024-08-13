@@ -48,6 +48,7 @@ func (gw *APIGatewayServer) LoginHandler(c echo.Context) error {
 	}
 	c.Set("user", token)
 	return c.JSON(http.StatusOK, echo.Map{
+		"path":  c.Path(),
 		"token": t,
 	})
 }

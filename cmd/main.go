@@ -4,11 +4,8 @@ import (
 	"os"
 
 	"github.com/emaforlin/api-gateway/internal/config"
-	"github.com/emaforlin/api-gateway/internal/entities"
 	"github.com/emaforlin/api-gateway/internal/middlewares"
 	"github.com/emaforlin/api-gateway/internal/server"
-	"github.com/golang-jwt/jwt/v4"
-	echojwt "github.com/labstack/echo-jwt"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/lpernett/godotenv"
@@ -41,15 +38,15 @@ func main() {
 
 	// main router
 	router := e.Group(baseUrl)
-	router.Use(echojwt.WithConfig(echojwt.Config{
-		NewClaimsFunc: func(c echo.Context) jwt.Claims {
-			return new(entities.CustomClaims)
-		},
-		SigningKey: []byte(os.Getenv("JWT_SECRET")),
-		Skipper: func(c echo.Context) bool {
-			return c.Path() == baseUrl+"/login" || c.Path() == baseUrl+"/signup" || c.Path() == baseUrl+"/signup/partner"
-		},
-	}))
+	// router.Use(echojwt.WithConfig(echojwt.Config{
+	// 	NewClaimsFunc: func(c echo.Context) jwt.Claims {
+	// 		return new(entities.CustomClaims)
+	// 	},
+	// 	SigningKey: []byte(os.Getenv("JWT_SECRET")),
+	// 	Skipper: func(c echo.Context) bool {
+	// 		return c.Path() == baseUrl+"/login" || c.Path() == baseUrl+"/signup" || c.Path() == baseUrl+"/signup/partner"
+	// 	},
+	// }))
 
 	router.POST(accountsBaseUrl+"/signup", svc.SignupHandler)
 	router.POST(accountsBaseUrl+"/signup/partner", svc.SignupPartnerHandler)
