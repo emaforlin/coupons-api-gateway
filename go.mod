@@ -5,9 +5,9 @@ go 1.22.5
 require (
 	cosmossdk.io/errors v1.0.1
 	github.com/emaforlin/accounts-service v1.1.0
-	github.com/golang-jwt/jwt/v4 v4.4.2
+	github.com/golang-jwt/jwt/v4 v4.5.0
 	github.com/golang-jwt/jwt/v5 v5.2.1
-	github.com/labstack/echo-jwt v0.0.0-20221127215225-c84d41a71003
+	github.com/labstack/echo-jwt/v4 v4.2.0
 	github.com/labstack/echo/v4 v4.12.0
 	github.com/lpernett/godotenv v0.0.0-20230527005122-0de1d4c5ef5e
 	google.golang.org/grpc v1.65.0
@@ -15,7 +15,7 @@ require (
 
 require (
 	github.com/pkg/errors v0.9.1 // indirect
-	google.golang.org/genproto/googleapis/rpc v0.0.0-20240808171019-573a1156607a // indirect
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20240812133136-8ffd90a71988 // indirect
 	google.golang.org/protobuf v1.34.2 // indirect
 )
 

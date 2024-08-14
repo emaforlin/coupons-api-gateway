@@ -15,7 +15,6 @@ import (
 )
 
 func (gw *APIGatewayServer) LoginHandler(c echo.Context) error {
-	client := accountsPb.NewAccountsClient(gw.AccountSvcConn)
 	reqBody := new(accountsModels.CheckLoginData)
 	if err := c.Bind(reqBody); err != nil {
 		c.Logger().Error(err)
@@ -25,7 +24,7 @@ func (gw *APIGatewayServer) LoginHandler(c echo.Context) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Second)
 	defer cancel()
 
-	res, err := client.CheckLoginData(ctx, reqBody.ToRPCStruct())
+	res, err := accountsPb.NewAccountsClient(gw.AccountSvcConn).CheckLoginData(ctx, reqBody.ToRPCStruct())
 	if err != nil {
 		c.Logger().Error(err)
 		return echo.ErrBadRequest
@@ -62,8 +61,7 @@ func (gw *APIGatewayServer) SignupHandler(c echo.Context) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Second)
 	defer cancel()
 
-	client := accountsPb.NewAccountsClient(gw.AccountSvcConn)
-	_, err := client.AddPersonAccount(ctx, reqBody.ToRPCStruct())
+	_, err := accountsPb.NewAccountsClient(gw.AccountSvcConn).AddPersonAccount(ctx, reqBody.ToRPCStruct())
 	if err != nil {
 		c.Logger().Error(err)
 		return echo.ErrBadRequest
@@ -80,8 +78,7 @@ func (gw *APIGatewayServer) SignupPartnerHandler(c echo.Context) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Second)
 	defer cancel()
 
-	client := accountsPb.NewAccountsClient(gw.AccountSvcConn)
-	_, err := client.AddFoodPlaceAccount(ctx, reqBody.ToRPCStruct())
+	_, err := accountsPb.NewAccountsClient(gw.AccountSvcConn).AddFoodPlaceAccount(ctx, reqBody.ToRPCStruct())
 	if err != nil {
 		return echo.ErrBadRequest
 	}

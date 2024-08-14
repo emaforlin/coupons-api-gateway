@@ -5,9 +5,25 @@ import (
 	"os"
 
 	"cosmossdk.io/errors"
+	"github.com/lpernett/godotenv"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 )
+
+var (
+	Port       = "8080"
+	BaseURL    = os.Getenv("BASE_URL")
+	ListenAddr = os.Getenv("LISTEN_ADDR")
+
+	AccountsBaseUrl = "/accounts"
+)
+
+func LoadConfig() {
+	godotenv.Load()
+	if os.Getenv("PORT") != "" {
+		Port = os.Getenv("PORT")
+	}
+}
 
 func MustMapEnv(target *string, envKey string) {
 	v := os.Getenv(envKey)
